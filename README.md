@@ -1,46 +1,31 @@
-# Flask Demo
+# Bot da boca
 
+haha, mais um repositório pela metade, sim amigos, eu sou um grande vagabundo
 
-This is a small Flask app that replies with a header dump to any request. 
+## O que é?
+  
+  O bot foi feito com a intenção de simular uma boca de fumo, sim meu amigo carioca, agora você pode se sentir em casa mesmo no discord com seus amigos, 
+  não é maravilhso?
 
+## Comandos
+  
+  como dito anteriormente, o bot ainda não está completo, mas atualmente apresenta uma vasta gama de 6 comandos, isso mesmo, 6 incríveis comandos! Isso não é uma piada?
+  
+  os comandos atualmente são:
+    
+    `!comprar - Compra a quantidade desejada da sua droga favorita! O livre mercado não é lindo?`
+    
+    `!rinha - Aposta uma certa quantia no seu galo favorito em uma emocionante rinha de galos! Haha, violência animal é tão legal`
+    
+    `!inventario - Mostra a quantidade de produtos contidos em seus bolsos, provavelmente o suficiente para uma acusação de porte para venda!`
+    
+    `!carteira - Eu realmente tenho que explicar?
+    
+    `!bico - Sem grana? É simples! Faça já um bico em algum lugar da comunidade e descole uma grana! A menos que seja com a dona neusa, aquela velha mão de vaca`
+    
+    `!ranking - Mostra o top 5 membros foda(ricos foda), já que a única coisa que move nossa sociedade é a inveja constante e o desejo de ser melhor que o próximo!`
+  
 
-You can deploy this application as is on Clever Cloud:
-
-```bash
-git remote add clevercloud {your-clever-cloud-endpoint}
-git push clevercloud master
-```
-
-And it will do the trick.
-
-We demonstrate several Clever Cloud possibilities in here:
-
-## Choose python version
-
-We have a python_version file in the clevercloud repository that
-contains "3". This will select the latest python 3 version installed (at the time of
-this writing, 3.4). Doc here:
-[https://www.clever-cloud.com/doc/python/python_apps/#use-python-3](https://www.clever-cloud.com/doc/python/python_apps/#use-python-3)
-
-## Build app in a subfolder
-
-In the `clevercloud/python.json` file, we have the
-"build"."folder" field that points to the "app" folder. We will build & run the app
-from this "app" folder.
-
-## Static files
-
-We set up in `clevercloud/python.json` a "static" folder: everything in
-that folder will be served statically. Note that the static folder will be the root of
-static files requests. In this example, to get to Cat.svg which is in the "s" folder in
-the clevercloud/static folder, you need to request "http://{yourdomain}/s/Cat.svg".
-
-You can also see that "s" is a link to the static folder at the root of the app. It's just
-to show that you can do symlinks.
-
-## Run the app
-
-As explained in
-[https://www.clever-cloud.com/doc/python/python_apps/#select-your-module](https://www.clever-cloud.com/doc/python/python_apps/#select-your-module) 
-we ask Clever Cloud to run the "app" Flask application defined in the "hello.py" file. So
-the "module" field is "hello:app".
+ ## Em breve
+ 
+  coisas
