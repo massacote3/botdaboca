@@ -1,29 +1,226 @@
 # -*- coding:utf-8 -*-
-
 import platform
 import subprocess
 from flask import Flask, Response, request
+from tinydb import TinyDB, Query
+from discord.ext import commands
+from tabulate import tabulate
+import threading
+import discord
+import random
 app = Flask(__name__)
+#=====================================><=============================#
+#databse setup
+drugs=TinyDB('drugs.json')
+users=TinyDB('users.json')
+qr=Query()
+#bot setup
+client = discord.Client()
+bot = commands.Bot(command_prefix='!')
+#filing databases in case they're empty when the bot runs
+names=['pó de 10', 'pó de 15','pino de 10','pino de 20','erva de 5','erva de 10','lança','bala']
+prices={'pó de 10': 10, 'pó de 15': 15, 'pino de 10': 10, 'pino de 20': 20, 'erva de 5': 5, 'erva de 10': 10, 'lança': 10,'bala': 25}
+bicos={'servente':50, 'mula':15, 'radinho':10, 'ajudante da dona neusa':0}
 
-@app.route("/")
-def headers():
-    return '<br/>'.join(['%s => %s' % (key, value) for (key, value) in request.headers.items()])
+for name in names:
+    ss=drugs.search(qr.name==name)
+    if ss==[]:
+        drugs.insert({'name':name,'price':prices.get(name)})
+#=====================================><====================================#
+async def on_ready():#login message
+    print('We have logged in as {0.user}'.format(bot))
+bot.add_listener(on_ready)
+    
+@bot.command()
+async def comprar(ctx, drug, qty):
+    user=users.search(qr.name==ctx.author.name)[0]
+    money=user['money']
+    inv=user['inventory']
+    try:    
+        prod=drugs.search(qr.name==drug)[0]
+    except:
+        await ctx.send('Coé menor nois num tem essa parada aqui não bota fé?')
+    if prod:
+        price=prod['price']
+        if money>price:
+            newmoney=money-price
+            users.update({'money':newmoney}, qr.name==ctx.author.name)
+            if prod['name'] not in inv.keys():
+                inv[prod['name']]=1
+                users.update({'inventory':inv}, qr.name==ctx.author.name)
+                await stx.send(f'{ctx.author.name} comprou {prod["name"]}')
+            else:
+                qt=inv.get(prod)
+                qt+=1
+                inv[prod]=qt
+                users.update({'inventory':inv}, qr.name==ctx.author.name)
+                await stx.send(f'{ctx.author.name} comprou {prod["name"]}')
+        else:
+            await ctx.send('Tá de caô comigo menor? essa merreca num compra nada aqui não')
 
-@app.route("/favicon.ico")
-def favicon():
-    resp = Response(status=200, mimetype='image/png')
-    return resp
+@bot.command()
+async def rinha(ctx, cock, bet):
+    user=users.search(qr.name==ctx.author.name)[0]
+    name=ctx.author.name
+    money=int(user['money'])
+    cocks=['caramuru', 'indiano', 'carijó', 'geromel']
+    if cock not in cocks:
+        await ctx.send('Escolhe teu galo namoral parcero, sem caô comigo')
+    else: 
+        if money<int(bet):
+            await ctx.send('Tá de tiração menor? junta a grana da aposta ae')
+        else:
+            choices=[1,0]
+            nb=random.choice(choices)
+            if nb==1:
+                profit=int(bet)
+                profit*=2
+                money+=profit
+                users.update({'money':money}, qr.name==ctx.author.name)
+                current=users.search(qr.name==name)[0]['money']
+                await ctx.send(f'Parábens cria, ganhou {profit} pila, tá patrão com {current} no bolso')
+            else:
+                money-=int(bet)
+                users.update({'money':money}, qr.name==ctx.author.name)
+                money=users.search(qr.name==name)[0]['money']
+                current=users.search(qr.name==name)[0]['money']
+                await ctx.send(f'Perdeu {bet} conto otário, só tem {current} no bolso, agora rala daqui')
 
-@app.route("/pyver")
-def pyver():
-    return platform.python_version()
+@bot.command()
+async def bico(ctx):
+    name=ctx.author.name
+    user=users.search(qr.name==ctx.author.name)[0]
+    mention=ctx.author.mention
+    money=int(user['money'])
+    keys=[]
+    for key in bicos.keys():
+        keys.append(key)
+    trampo=random.choice(keys)
+    valor=bicos.get(trampo)
+    money+=valor
+    users.update({'money':money}, qr.name==ctx.author.name)
+    await ctx.send(f'{mention} fez um bico de {trampo} e ganhou {valor} reais')   
 
-@app.route("/tag")
-def tag():
-    p = subprocess.Popen(['git', 'describe', '--tags', '--abbrev=0'], stdout=subprocess.PIPE)
-    p.wait()
-    return p.stdout.read()
+@bot.command()
+async def ranking(ctx):
+    us=users.all()
+    index=[]
+    headers=['Usuário', 'Grana']
+    tables=[]
+    for i in us:
+        index.append(i['money'])
+    index.sort()
+    inv=index[::-1]
+    n=0
+    for i in inv:
+        user=users.search(qr.money==i)
+        item=[]
+        while n<len(us):
+            try:    
+                if [user[n]['name'],user[n]['money']] not in tables:
+                    tables.append([user[n]['name'],user[n]['money']])
+                    break
+                else:
+                    pass
+                n+=1
+            except:
+                pass
+    print(tabulate(tables, headers, tablefmt="psql"))       
+    await ctx.send('Ranking da boca')
+    await ctx.send(tabulate(tables, headers, tablefmt="psql"))
+    print(tabulate(tables, headers, tablefmt="psql"))
 
-if __name__ == "__main__":
-    app.run()
+@bot.command()
+async def grana(ctx, qtd, *name):
+    user=users.search(qr.name==ctx.author.name)[0]
+    if ctx.author.name=='GERENTE DO PRETO':
+        if not name:
+            users.update({'money':qtd}, qr.name==ctx.author.name)
+            await ctx.send(f'Mais {qtd} pila pro patrão')
+        else:
+            users.update({'money':qtd}, qr.name==str(name))
+            await ctx.send(f'Mais {qtd} pila pro menor')
+    
+@bot.command()
+async def inventario(ctx):
+    name=ctx.author.name
+    mention=ctx.author.mention
+    inv=users.search(qr.name==name)[0]['inventory']
+    headers=['Item', 'Quantidade']
+    table=[]
+    for key in inv.keys():
+        item=[]
+        item.append(str(key))
+        item.append(str(inv.get(key)))
+        table.append(item)
+    await ctx.send(mention+'Seu inventário contém:')
+    await ctx.send(tabulate(table, headers, tablefmt="psql"))
+    
+@bot.command()
+async def carteira(ctx):
+    name=ctx.author.name
+    mention=ctx.author.mention
+    money=users.search(qr.name==name)[0]['money']
+    await ctx.send(f'{mention} você tem {money} reais')
 
+@bot.command()
+async def walker(ctx):
+    await ctx.send('Walker vá a merda')
+
+@bot.command()
+async def caixadagua(ctx):
+    await ctx.send('Ian, já resolveu a tela verde?')
+
+@bot.command()
+async def sulista(ctx):
+    await ctx.send('ovo deletar o zapkkkkkkkk')
+
+@bot.command()
+async def poste(ctx):
+    await ctx.send('Isaque acaba de cortar sua net')
+
+@bot.command()
+async def carioca(ctx):
+    await ctx.send('carioca rico vai sortear uns games pra rapaziada')
+
+@bot.command()
+async def commands(ctx):
+    await ctx.send("""Comandos do bot:
+                    !comprar - compra a boa
+                    produtos: pó de 10, pó de 15, pino de 10, pino de 20, erva de 5, erva de 10, lança e bala
+                    usos: !comprar <produto> <quantidade>
+                    =====================================================
+                    !rinha - aposta no seu galo favorito 
+                    galos: caramuru, indiano, carijó e geromel
+                    usos: !rinha <nome do galo> <valor> 
+                    =====================================================
+                    !inventário - mostra seu inventário
+                    =====================================================
+                    !carteira - quanta grana tu tem
+                    =====================================================
+                    mais comandos quando o adm quiser, não sou empregado de ninguém""")
+    
+#some debug commands
+@bot.command()
+async def users(ctx):
+    user=users.search(qr.name==ctx.author.name)[0]
+    if ctx.author.name=='GERENTE DO PRETO':
+        us=users.all()
+        await ctx.send(us)
+    else:
+        pass
+#======================><=======================#
+@app.route('/')
+def run():
+    bot.run('NzU4MTYxNzgyODExNzg3Mjc0.X2q7Lg.hRx-y9L1wFo0lJRSsBEMjnDj9m8')
+    us=[]
+    for i in bot.users:
+        if i.bot:
+            pass
+        else:
+            us.append(i.name)
+            ss=users.search(qr.name==i.name)
+            if ss==[]:
+                users.insert({'name':i.name, 'xp':0, 'money':20, 'inventory':{}})
+    
+app.run()
