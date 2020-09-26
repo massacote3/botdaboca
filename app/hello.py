@@ -10,6 +10,8 @@ import discord
 import random
 import time
 import sys
+import os
+KEY=os.getenv("SECRET_KEY")
 app = Flask(__name__)
 #=====================================><=============================#
 #databse setup
@@ -228,26 +230,26 @@ async def usuarios(ctx):
     else:
         pass
 #======================><=======================#
-'''@app.route('/')
-def run():'''
-bot.run('NzU4MTYxNzgyODExNzg3Mjc0.X2q7Lg.WysEE_7k7Jh4mei5z2TO7_1k9MY')
-'''time.sleep(10)
-    value=switch.all()[0]['value']
-    if value==1:
-        switch.update({'value':0}, qr.value==1)
-        pass
-    else:
-        switch.update({'value':1}, qr.value==0)
-        sys.exit()
-        
-    us=[]
-    for i in bot.users:
-        if i.bot:
+@app.route('/')
+def run():
+    bot.run(KEY)
+    time.sleep(10)
+        value=switch.all()[0]['value']
+        if value==1:
+            switch.update({'value':0}, qr.value==1)
             pass
         else:
-            us.append(i.name)
-            ss=users.search(qr.name==i.name)
-            if ss==[]:
-                users.insert({'name':i.name, 'xp':0, 'money':20, 'inventory':{}})
-    
-app.run()'''
+            switch.update({'value':1}, qr.value==0)
+            sys.exit()
+            
+        us=[]
+        for i in bot.users:
+            if i.bot:
+                pass
+            else:
+                us.append(i.name)
+                ss=users.search(qr.name==i.name)
+                if ss==[]:
+                    users.insert({'name':i.name, 'xp':0, 'money':20, 'inventory':{}})
+        
+app.run()
