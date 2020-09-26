@@ -230,7 +230,7 @@ async def usuarios(ctx):
 #======================><=======================#
 '''@app.route('/')
 def run():'''
-bot.run('NzU4MTYxNzgyODExNzg3Mjc0.X2q7Lg.hRx-y9L1wFo0lJRSsBEMjnDj9m8')
+bot.run('NzU4MTYxNzgyODExNzg3Mjc0.X2q7Lg.WysEE_7k7Jh4mei5z2TO7_1k9MY')
 '''time.sleep(10)
     value=switch.all()[0]['value']
     if value==1:
